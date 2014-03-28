@@ -476,7 +476,7 @@ class pf:
     """
 
     def __init__(self, filename='as_R.UXD', echo=False,
-                 mode='pf', bgmode='manual', monitoring = False,
+                 mode='pf', bgmode='auto', monitoring = False,
                  sep = "; (Data for Range number", info=False):
         print ''
         print '---------------------------'
