@@ -1,69 +1,59 @@
 """
-UXD (BRUKER D8 DISCOVER) to epf(popLA compatible) converter 
-developed on (2010-Dec-29)
+UXD (BRUKER D8 DISCOVER) to epf(popLA compatible) converter
+initially developed on (2010-Dec-29)
 
 YOUNGUNG JEONG
-   Materials Mechanics Laboratory,
-   GIFT, POSTECH
+   Materials Mechanics Laboratory, GIFT, POSTECH (2007-2013)
+   MSE Division, NIST, US                        (2014-)
 
-Editor used : GNU Emacs
+   youngung.jeong@gmail.com
+   youngung.jeong@nist.gov
 
-planned feature 
- 1. Background subtraction 
- 2. Defocusing correction 
- 3. Convert UXD file into EPF 
- 4. Make and save defocuse data 
- 5. All features need be interactive for later modifications
- 6. pole figure monitoring with respect to corrections (bg, dfc)
-
-
-
-UXD 2THETA - INTENSITY PROFILE plotting software
-  developed on (2011-Jan-25)
-
-  ** UXD 2theta scan plotter with different khis.. 
-  ** This job may require 3D plotting with one of three axes being the khi.
-
-
+Features
+ 1. Background subtraction
+ 2. Defocusing correction
+ 3. Convert UXD file into EPF
+ 4. Make and save defocuse data
+ 5. pole figure monitoring with respect to corrections (bg, dfc)
+"""
+__manual__="""
 ***************************************
  Experimental polefigure post-processor
 ***************************************
 Exemplery use,
 >> import uxd>> myPF = uxd.pf(filename ='as_R.UXD',,
  echo = False, mode='pf', bgmode='auto',,
- monitoring = False) 
+ monitoring = False)
  uxd.pf class has arguments,
  : filename, echo(False, True), mode('pf','df'),,
  bgmode('manual','auto', None)
  >> polefigures = myPF.INTENSITIES
  >> pole0 = np.array(polefigures[0])
- >> uxd.pfsplot(pfs=pole0)     ---> This will show up the pole figure 
+ >> uxd.pfsplot(pfs=pole0)     ---> This will show up the pole figure
 
 ***************************************
-   2theta(fixed khi)-intensity plotting 
+   2theta(fixed khi)-intensity plotting
 ***************************************
 >> x,y,khi = uxd.prof(filename='304.uxd')
->> plot(x,y) ... 
+>> plot(x,y) ...
 """
 #### prints out the documentation to the module.####
-print __doc__
+# print __manual__
 ####################################################
 
 import numpy as np
-import glob
-import os
-try: from mpl_toolkits.mplot3d import Axes3D
-except: print'Axes3D toolkit is not loaded '
+sort = np.sort
+mean = np.mean
+import glob, os
+
+# try: from mpl_toolkits.mplot3d import Axes3D
+# except: print'Axes3D toolkit is not loaded '
+
 try:
     import pylab
     from pylab import *
-except: 
+except:
     print 'pylab module could not be imported'
-sort = np.sort
-mean = np.mean
-
-
-#from upf import pfnorm  #pf normalize data
 
 def prof(filename=None):
     """
@@ -91,7 +81,7 @@ def profall(preppend):
     files = glob.glob('%s*'%preppend)
     intensities = []
     x = []; y = []; zs = []
-    for i in files: 
+    for i in files:
         tx, ty, kh = prof(filename=i)
         intensities.append(zip(tx,ty))
         zs.append(kh)
@@ -120,7 +110,7 @@ def profall(preppend):
     return intensities, zs
 
 
-def pfsplot(pfs=None, ifig=6, idot=False,x0=0,y0=0): 
+def pfsplot(pfs=None, ifig=6, idot=False,x0=0,y0=0):
     """plot pole figures using matplotlib package """
     try: plt.figure(ifig)
     except :
@@ -129,10 +119,10 @@ def pfsplot(pfs=None, ifig=6, idot=False,x0=0,y0=0):
         print "Please try fig.figure(3) and see if is true"
         return -1
     try: plt
-    except: 
+    except:
         print "plt module is not existed"
     print "\n********** pole figure plot internal module ************\n"
-    if pf==None: 
+    if pf==None:
         print "\n*****************************************************"
         print " Wrong argument type found. It must be a polefigure "
         print "Will return -1"
@@ -172,7 +162,7 @@ def pfsplot(pfs=None, ifig=6, idot=False,x0=0,y0=0):
     tempax = tempfig.add_subplot(111, aspect='equal')
     ax.set_axis_off()
 
-    ### contour     
+    ### contour
     if idot==False:
         ## plot and delete the temperal axis
         cnt = tempax.contour(x,y,TEMP)
@@ -205,8 +195,8 @@ def pfsplot(pfs=None, ifig=6, idot=False,x0=0,y0=0):
     ax.plot(x,y,color='gray',ls='--',alpha = 0.3)
 
 
-def __pf_plot__(intensity=None, 
-                ifig=6, 
+def __pf_plot__(intensity=None,
+                ifig=6,
                 x0=0, y0=0):   #dispose arguments :delt_alpha = 5, delt_khi = 5
     """pole figure plot using matplotlib package """
     try: plt.figure(ifig)
@@ -216,11 +206,11 @@ def __pf_plot__(intensity=None,
         print "Please try fig.figure(3) and see if is true"
         return -1
     try: plt
-    except: 
+    except:
         print "plt module is not existed"
 
     print "\n********** pole figure plot internal module ************\n"
-    if pf==None: 
+    if pf==None:
         print "\n*****************************************************"
         print " Wrong argument type found. It must be a polefigure "
         print "Will return -1"
@@ -245,7 +235,7 @@ def __pf_plot__(intensity=None,
     pole = np.array(pole)
 
 
-    ##### 
+    #####
     phi_temp = np.linspace(0.,360,360/5+1)
     R_TEMP,PHI_TEMP = np.meshgrid(r,phi_temp)
     TEMP = np.resize((),(pole.shape[1],pole.shape[0]))
@@ -267,11 +257,11 @@ def __pf_plot__(intensity=None,
     y = y + y0
     fig = plt.figure(ifig)
     ax = fig.add_subplot(111, aspect='equal')
-    
+
     contour(x,y,TEMP)
     #contourf(x,y,TEMP)  #cotour -filled mode
     plt.show()
-    
+
     ### Circular outer rim drawing
     theta = np.linspace(0.,360.,1000)
     Radius = 1.0
@@ -289,13 +279,13 @@ def __pf_plot__(intensity=None,
 
 
 def xyz(intensity,ix,iy):
-    """ 
+    """
     xyz
-    Planned to be used, but looks disposed now. 
+    Planned to be used, but looks disposed now.
     """
     if len(intensity)==17:
         xgrid = 5
-    else: 
+    else:
         print 'Unexpected Khi step'
         raise IOError
 
@@ -305,7 +295,7 @@ def xyz(intensity,ix,iy):
     else:
         print 'Unexpected phi step'
         raise IOError
-    
+
 
     z = intensity[ix][iy]
     return ix*xgrid,y*ygrid,z
@@ -394,7 +384,7 @@ def determine_block_indicator(block):
     block_indicator = 'unknown'
     i=0
     while True:
-        try: 
+        try:
             dat = map(float,block[i].split())
             if len(dat)!=2: raise IOError
         except:
@@ -420,7 +410,7 @@ def th2count(block, block_indicator = '_2THETACOUNTS'):
         i = i + 1
         try : block[i]
         except IndexError : return intensities, phi2
-        else: 
+        else:
             if len(block[i])< 3: return intensities, phi2
             try:
                 current_intensity = map(float, block[i].split())
@@ -432,14 +422,14 @@ def th2count(block, block_indicator = '_2THETACOUNTS'):
                 intensities.append(current_intensity[1])
                 phi2.append(current_intensity[0])
 
-            
+
 class pf:
     """
-    pole figures 
-    Arguments : 
+    pole figures
+    Arguments :
          filename = 'as_R.UXD'
          echo = False
-         mode = 'pf'  : flag for defocusing data or pole figure aquisition 
+         mode = 'pf'  : flag for defocusing data or pole figure aquisition
                      if mode =='pf': pole figure aquisition
                      elif mode =='df': defocusing correction
                       -> defocusing data is written down to a files
@@ -448,7 +438,7 @@ class pf:
        Due to use of 'set' type variable,
        the order of blocks are messed up.
        I've tried to bypass this but failed.
-       
+
        Since non-ordered case is more general,
        in applicability-wise, it is good.
        While, it is bad in coding-wise.
@@ -466,13 +456,13 @@ class pf:
             argument:
               filename,
               echo = FALSE
-              mode = 'df, 
+              mode = 'df,
                      'df' for defocus curve making,
                      'pf' for post-process the experimental pole figure
               bgmode = 'manual', 'auto'
               sep = "; (Data for Range number)"
-     
-            *argument sep was added on 2011-01-10 
+
+            *argument sep was added on 2011-01-10
              sep is a separator in between data blocks.
              This can be different even between uxd files.
              Care must be taken for this.
@@ -481,35 +471,32 @@ class pf:
      *** pole figure projections ***
        >>> mypfs = myclass.INTENSITIES
        >>> uxd.__pf_plot__(intensity = mypfs[0], ifig=9, x0 = 0, y0=0)
-       >>> 
-              
+       >>>
+
     """
-    
-    def __init__(self, filename='as_R.UXD', echo=False, 
+
+    def __init__(self, filename='as_R.UXD', echo=False,
                  mode='pf', bgmode='manual', monitoring = False,
-                 sep = "; (Data for Range number" ):
+                 sep = "; (Data for Range number", info=False):
+        print ''
+        print '---------------------------'
         if mode == 'pf':
-            print ''
-            print '---------------------------'
             print 'POLE FIGURE AQUISITION MODE'
-            print '---------------------------\n'
         elif mode =='df':
-            print ''
-            print '---------------------------'
             print 'DEFOCUS DATA AQUSITION MODE'
-            print '---------------------------\n'
-        
+        print '---------------------------'
+
         blocks = make_blocks(filename=filename, sep = sep)
         self.blocks = blocks
         blocks = block_in(blocks)
         header = blocks[0]
         self.data_block = blocks[1:len(blocks)]
-   
+
         # Trim the data_block neatly.
         for i in range(len(self.data_block)):
             self.data_block[i]=self.data_block[i][0:len(self.data_block[i])-1]
-           
-        print '** Total number of data blocks: ', len(self.data_block)
+
+        #print '** Total number of data blocks: ', len(self.data_block)
 
 
         self.th2s = []
@@ -531,9 +518,9 @@ class pf:
         #print th2"
         #if raw_input()=='q': raise IOError"
 
-        print 'Kinds of _2theta are printed out'
-        for i in range(len(th2)):
-            print th2[i], '',
+        # print 'Kinds of _2theta are printed out'
+        # for i in range(len(th2)):
+        #     print th2[i], '',
 
         # while True:
         #     try:
@@ -561,35 +548,39 @@ class pf:
                 self.backgrounds.append(self.pfs[i])
 
 
-        print '\n'
+        print '%8s %10s %8s %8s %9s %10s'%(
+            'PF id', '2theta', 'dalph', 'dkhi',
+            'stime [s]', 'dang [deg]')
         for i in range(len(self.polefigures)):
-            print 'PF #',i+1
             _2th, _st, _sz, d_alpha, d_khi, _khis = self.pf_info(self.polefigures[i])
-            print 'peak at Bragg the 2theta of ', round(_2th,3)
-            print 'delta alpha  = ', d_alpha,' delta khi = ', d_khi,
-            print '    step time :', _st,
-            print '    step size :', _sz
+            print '%8i %10.1f %8.1f %8.1f %9.1f  %9.1f'%(
+                i,_2th,d_alpha,d_khi,_st,_sz)
 
-
-        print '\n'
+        print '%8s %10s %8s %8s %9s %10s'%(
+            'BG id', '2theta', 'dalph', 'dkhi',
+            'stime [s]', 'dang [deg]')
         for i in range(len(self.backgrounds)):
-            print 'BG #', i+1
             _2th, _st, _sz, d_alpha, d_khis, _khis = self.pf_info(self.backgrounds[i])
-            print 'peak at Bragg the 2theta of ', round(_2th,3)
-            if d_alpha !='unknown': print 'delta alpha = ', d_alpha, 
-            print ' delta khi   = ', d_khi,
-            print '    step time :', _st,
-            print '    step size :', _sz
+            if d_alpha=='unknown': d_alpha =np.nan
+            print '%8i %10.1f %8.1f %8.1f %9.1f  %9.1f'%(
+                i,_2th,d_alpha,d_khi,_st,_sz)
 
+            # print 'peak at Bragg the 2theta of ', round(_2th,3)
+            # if d_alpha !='unknown': print 'delta alpha = ', d_alpha,
+            # print ' delta khi   = ', d_khi,
+            # print '    step time :', _st,
+            # print '    step size :', _sz
+
+        if info==True: return
         raw_input(' Press Enter  >>> ')
 
         self.__pf_selection__()
 
-        raw_input("Press enter if you'd like to proceed >> ")
+        #raw_input("Press enter if you'd like to proceed >> ")
 
-        if os.name=='nt': os.system('cls')
-        elif os.name=='posix': os.system('clear')
-            
+        # if os.name=='nt': os.system('cls')
+        # elif os.name=='posix': os.system('clear')
+
         print "\n\n***************************************************************"
         print "d_alpha is given to backgrounds, that's most probably because"
         print "the backgrounds are measured only at along a certain phi angle"
@@ -601,9 +592,9 @@ class pf:
         #----------------------------------------------------------
         # Recommends sets of polefigure and its background measure
         #----------------------------------------------------------
-        self.__pf_bg_sets__(bgmode = bgmode)  
+        self.__pf_bg_sets__(bgmode = bgmode)
             #access the combination set by self.combi_pf_bg
-        """ 
+        """
         Note that if bgmode is None, background is not subtracted
         in the final end. This Ipf = Ipf - dI is not performed in the
         next big loop below
@@ -616,20 +607,20 @@ class pf:
         #----------------------------------------------------------
 
         INTENSITIES =[]
-        
+
         if bgmode==None:
             for i in range(len(self.polefigures)):
                 INTENSITIES.append([])
                 for j in range(len(self.polefigures[i])):
                     INTENSITIES[i].append([])
-                    C_pf = self.polefigures[i][j]      
+                    C_pf = self.polefigures[i][j]
                     Ipf = th2count(block = C_pf )[0]    #intensity
                     info_temp = self.block_info(C_pf, echo=False)
                     #normalization by the step time
-                    for k in range(len(Ipf)): 
+                    for k in range(len(Ipf)):
                         Ipf[k] = Ipf[k]/float(info_temp[2])
                         INTENSITIES[i][j].append(Ipf[k])
-            
+
             #monitoring upon polefigure
             if monitoring ==True:
                 if os.name=='posix': os.system('clear')
@@ -642,14 +633,14 @@ class pf:
                         __pf_plot__(intensity = polefigures[i], ifig=6+i)
                     else : pass
             else: pass
-                    
+
         elif bgmode!=None:
             for i in range(len(self.polefigures)):
-                INTENSITIES.append([])            
+                INTENSITIES.append([])
                 "On each polefigure set"
                 iask = True
                 for j in range(len(self.polefigures[i])):
-                    INTENSITIES[i].append([])                 
+                    INTENSITIES[i].append([])
                     " On each chi "
                     R_bg = self.backgrounds[self.combi_pf_bg[i][0]][j]
                     L_bg = self.backgrounds[self.combi_pf_bg[i][1]][j]
@@ -679,20 +670,20 @@ class pf:
                     for k in range(len(Ipf)):  Ipf[k] =Ipf[k]/float(pf_steptime)
                     for k in range(len(Ibgl)): Ibgl[k]=Ibgl[k]/float(L_bg_steptime)
                     for k in range(len(Ibgr)): Ibgr[k]=Ibgr[k]/float(L_bg_steptime)
-                    
+
                     if bgmode!=None:
                         bglr_len = [len(Ibgl),len(Ibgr)]
                         if any(bglr_len[k] !=len(Ipf) for k in range(2)):
-                            print '** Partial background measured **'
+                            #print '** Partial background measured **'
                             pass
 
                     elif bgmode==None: print '** No Background subtraction **'
 
                     for k in range(len(Ipf)):
                         """
-                        If Ibgl and Ibgr were measured at a certain phi, 
+                        If Ibgl and Ibgr were measured at a certain phi,
                         at different phi then
-                        that certain phi is assumed to be that of the only measured 
+                        that certain phi is assumed to be that of the only measured
                         """
                         try: cibgl = Ibgl[k]
                         except IndexError: cibgl = Ibgl[0]
@@ -711,7 +702,7 @@ class pf:
                                 if len(ans)==0: pass
                                 elif ans =='yes': pass
                                 elif ans =='ignore': iask = False; pass
-                                elif ans =='no': 
+                                elif ans =='no':
                                     print "\n******************************************"
                                     print "There's no 'no' answer here"
                                     print "Negative intensity is physically non-sense"
@@ -788,13 +779,13 @@ class pf:
                 else: print 'Wrong fileformat input'; raise IOError
             if fileformat == None: pass
             else:
-                print " Type the file name"
-                filename = raw_input(" >> ")
+                filename = raw_input("Type the file name default='dum.epf'>> ")
+                if filename=='': filename='dum.epf'
                 self.write(filename=filename, mode=fileformat)
-                
+
         elif mode=='df':  #defocus correction curve making mode
             #--------------------------------
-            # DEFOCUS CORRECTION CURVE FILE 
+            # DEFOCUS CORRECTION CURVE FILE
             #--------------------------------
             print "\n\n ****************************************"
             print " * Defocus correction curve file maker *"
@@ -809,9 +800,9 @@ class pf:
         """
         current_int = self.INTENSITIES[pf_id]
         print 'Defocusing file name is =', filename
-        #df_factor = 
+        #df_factor =
         FILE = open(filename,'r')
-        
+
         lines = FILE.readlines()
         lines = lines[5:len(lines)]
         FILE.close()
@@ -823,7 +814,7 @@ class pf:
         df_factor = temp
 
         if len(df_factor)==len(current_int): pass
-        else: 
+        else:
             print 'len(df_factor), len(current_int)', len(df_factor),len(current_int)
             raw_input()
             print "defocus file and given polefigure have different khi range"
@@ -834,11 +825,11 @@ class pf:
                 self.INTENSITIES[pf_id][i][j] = current_int[i][j] * df_factor[i]
 
 
-    def defc(self, pfid=None, 
-             filename='dfc_file.dfc', 
+    def defc(self, pfid=None,
+             filename='dfc_file.dfc',
              mode='avg'):
         """
-        Save file for defocusing correction 
+        Save file for defocusing correction
         from the random texture sample.
 
         >> import uxd
@@ -853,7 +844,7 @@ class pf:
            pfid = None (starts from 0)
            filename = 'defocusing_file'
            mode = 'avg', 'all', 'RD'*
-                  *If is 'RD' then records only at along phi=0 
+                  *If is 'RD' then records only at along phi=0
 
         Preliminary:
            You should subtract the background in advance,
@@ -885,7 +876,7 @@ class pf:
         FILE.writelines(comments+'\n')
         FILE.writelines('_2THETA=%8.3f\n'%(_2theta))
         FILE.writelines('  Khi  Intensity    DF_factor\n')
-        
+
         for i in range(len(I_stand)):  # khi
             if mode== 'RD':
                 # conventional case
@@ -906,37 +897,34 @@ class pf:
                 curve.append(mean(cwl))
                 FILE.writelines(' %5i      %7.3f\n'%
                                 (mean(cwl), float(curve[0])/float(mean(cwl))))
-                
+
         pass
 
-                
+
 
     def __pf_selection__(self):
-        print " \n\n"
-        print " ****************************************"
-        print " *        POLE FIGURE SELECTION         *"
-        print " * Select only some of the pole figures *"
-        print " ****************************************\n\n"
+        # print " ****************************************"
+        # print " * Select only some of the pole figures *"
+        # print " ****************************************\n"
 
-        print "**********************************"
-        print "*     list of pole figures       *"
-        print "**********************************\n"
-
-        print "%8s %7s\n"%('PF id', '2theta')
+        # print "%8s %7s"%('PF id', '2theta')
         pf_slc = []
-        for i in range(len(self.polefigures)):
-            _2th, _st, _sz, d_alpha, d_khi, _khis = self.pf_info(self.polefigures[i])
-            print "%8i %7.3f\n"%(i,_2th)
-        
-        print "\nPlease type the id of your polefigure\n"
-        print "with delimiter as ',' e.g. 0,1,2\n"
-        pf_slc_id =map(int, raw_input(' >  ').split(','))
+        # for i in range(len(self.polefigures)):
+        #     _2th, _st, _sz, d_alpha, d_khi, _khis = self.pf_info(self.polefigures[i])
+        #     print "%8i %7.1f"%(i,_2th)
 
-        temp_pf = []
-        for ID in pf_slc_id:
-            temp_pf.append(self.polefigures[ID])
-    
-        self.polefigures = temp_pf
+        print "\nPlease choose your pole figures of interest",
+        print "with the delimiter ',' e.g. 0,1,2 or type all(default)"
+        dst = raw_input(' > ')
+        if dst=='': dst='all'
+        if dst!='all':
+            pf_slc_id =map(int, dst.split(','))
+            temp_pf = []
+            for ID in pf_slc_id:
+                temp_pf.append(self.polefigures[ID])
+
+            self.polefigures = temp_pf
+        elif dst=='all': pass
 
 
     def __normalize___(self):
@@ -952,36 +940,36 @@ class pf:
             for j in range(len(self.INTENSITIES[i])):
                 tmx.append(max(self.INTENSITIES[i][j]))
         mx = max(tmx)
-        
+
         if mx > 9999:
             for i in range(len(self.INTENSITIES)):
                 for j in range(len(self.INTENSITIES[i])):
                     for k in range(len(self.INTENSITIES[i][j])):
                         self.INTENSITIES[i][j][k] = self.INTENSITIES[i][j][k]*9999/mx
         else: pass
-        
+
         tmx = []
         for i in range(len(self.INTENSITIES)):
             for j in range(len(self.INTENSITIES[i])):
                 tmx.append(max(self.INTENSITIES[i][j]))
         mx = max(tmx)
-        
-        if mx > 9999.499: 
+
+        if mx > 9999.499:
             print 'unexpected result in def _avg_out_'
             print mx
             raw_input()
             #raise IOError
 
-        
+
     def write(self, filename='temp.pf', mode='list'):
         """
         Writes intensities
-        
+
         filename ='temp.pf'
         mode = 'list', 'epf', ... and so on (only if necessary later on)
         """
         # Writes to a file having
-        # one column listing all the raw intensities 
+        # one column listing all the raw intensities
         # as of given at the current stream through.
         if mode=='list':
             FILE = open(filename,'w')
@@ -996,29 +984,37 @@ class pf:
                         FILE.writelines('%8i\n'%(self.INTENSITIES[i][j][k]))
             FILE.close()
 
-        elif mode=='epf':  
+        elif mode=='epf':
             'Experimental Pole Figure format (in abbreviation epf)'
             'compatible to popLA, LABOTEX'
             try: ext = filename.split('.')[-1]
             except IndexError: filename=filename+'.epf'
             else:
                 if ext =='epf': pass
-                else : 
+                else :
                     filename = filename.split('.')[0]
                     filename = filename+'.epf'
-                    
+
             FILE = open(filename,'w')
 
             header ='** Needs header here'
+            print '\n-------------------------------------'
+            print "2th-hkl in GIFT bruker's default tube"
+            print open('./ref/gift_bruker.ref','r').read()
+            print '-------------------------------------\n'
+            print '\nType the indices of the current polefigure',
+            print 'with spacing'
+            print '--------------'+\
+                '-----------------------------------------'
+            print '%5s %5s'%('PF','2th' )
             for i in range(len(self.INTENSITIES)):
                 FILE.writelines('%s\n'%(header))
                 # i: ID of pole figure self.polefigures[i]
                 info = self.pf_info(self.polefigures[i])
-                print 'The Bragg 2theta of pf',i+1,'#',
-                print info[0]
-                print 'Type the indices of the current polefigure',
-                print 'with spacing'
-                index = raw_input(' >>>   ')
+                #print 'The Bragg 2theta of pf',i,'#',
+                #print info[0]
+
+                index = raw_input('%5i %5.1f  >>> '%(i,info[0]))
                 index = map(int, index.split())
 
                 khi_inc = info[4]
@@ -1030,13 +1026,13 @@ class pf:
                 FILE.writelines('%5.1f%5.1f'%(phi_inc,360.))
                 FILE.writelines('%2i%2i%2i%2i%2i'%(1,1,2,-1,3))
                 FILE.writelines('%5i%5i\n'%(99,1))
-                
+
                 #for j in range(len(self.INTENSITIES[i])):
                 for j in range(int(90/khi_inc) + 1):
                     # j : ID of each khi scan in self.polefigures[i]
                     # corresponding to self.polefigures[i][j]
                     FILE.writelines(' ')
-                    for k in range(int(phi_max/phi_inc) + 1): 
+                    for k in range(int(phi_max/phi_inc) + 1):
                         try:
                             stream = self.INTENSITIES[i][j][k]
                             if int(stream) == 0: stream = 1  #This is for preventing a measured intensity to be zero
@@ -1050,7 +1046,7 @@ class pf:
                 FILE.writelines('\n')
         else:
             print "You typed wrong type flag"; return -1
-                
+
 
     def __pf_bg_sets__(self, bgmode='manual'):
         """
@@ -1058,22 +1054,20 @@ class pf:
         """
         self.combi_pf_bg = []
         bg2ths = []
-        th2_diff = []
-        print "\n\n ***  POLEFIGURES"
+        print '%5s %7s'%('PF','2theta')
         for i in range(len(self.polefigures)):
-            print 'PF #',i,"'s info"
-            print 'The Bragg 2theta = ', self.pf_info(self.polefigures[i])[0]
+            _2th = self.pf_info(self.polefigures[i])[0]
+            print '%5i %10.2f'%(i,_2th)
 
-        print "\n ***  BACKGROUNDS "
+        print '%5s %7s'%('BG','2theta')
         for i in range(len(self.backgrounds)):
-            print 'BG #',i,"'s info"
             bg2ths.append(self.pf_info(self.backgrounds[i])[0])
-            print 'The Bragg 2theta = ', bg2ths[i]
-        print '\n\n' 
-        
+            print '%5i %10.2f'%(i,bg2ths[i])
+
         if bgmode=='manual':
+            print 'Type two Background IDs for individual Pole figures (eg., 0,1)'
             for i in range(len(self.polefigures)):
-                answer = raw_input('Type the '+str(i)+'th PFs bg ids (eg. 0,2)')
+                answer = raw_input('PF %s >>'%str(i))
                 self.combi_pf_bg.append(map(int,answer.split(',')))
         else:
             if bgmode=='auto':
@@ -1081,12 +1075,12 @@ class pf:
                     crr_2theta = self.pf_info(self.polefigures[i])[0]
                     temp = __near__(a=crr_2theta, b=bg2ths)
                     self.combi_pf_bg.append(temp)
-            elif bgmode==None: 
+            elif bgmode==None:
                 # Even bgmode is give as None behaves as if it were 'auto'
                 # Background will not be subtracted in the end, however.
                 for i in range(len(self.polefigures)):
                     crr_2theta = self.pf_info(self.polefigures[i])[0]
-                    #This is for checking 
+                    #This is for checking
                     """
                     temp = __near__(a=crr_2theta, b=bg2ths)
                     self.combi_pf_bg.append(temp)
@@ -1099,7 +1093,7 @@ class pf:
         """
         print information of pole figure block
 
-        phi 
+        phi
         range of phi, khi
         grid of phi(0~355), khi(0~80)
         stepsize
@@ -1117,7 +1111,7 @@ class pf:
             _khi        = float(info[1])
             if i == 0: temp = _khi
             if i == 1: _d_khi = abs(_khi-temp)
-                
+
             _steptime.append(float(info[2]))
             _stepsize.append(float(info[3]))
             try:  _delta_alpha =float(info[4])
@@ -1126,7 +1120,7 @@ class pf:
             _khis.append(_khi)
             peak_at.append(_2theta)
             _d_alpha.append(_delta_alpha)
-        
+
         if self.__isuniq__(peak_at):pass
         else:
             print 'Positions of bragg peaks are not unique ',
@@ -1136,12 +1130,12 @@ class pf:
         else:
             print '_STEPTIME is not unique ',
             print 'within the given pole figure'
-            raise IOError            
+            raise IOError
         if self.__isuniq__(_stepsize): pass
         else:
             print '_STEPSIZE is not unique ',
             print 'within the given pole figure'
-            raise IOError                        
+            raise IOError
         if self.__isuniq__(_d_alpha):pass
         else:
             print '_d_alpha is not unique ',
@@ -1149,7 +1143,7 @@ class pf:
             raise IOError
         return peak_at[0], _steptime[0], _stepsize[0], _d_alpha[0], _d_khi, _khis
 
-            
+
     def __isuniq__(self,alist):
         """
         Sees if all the elements in a tuple variable is the same or not.
@@ -1161,7 +1155,7 @@ class pf:
             for i in range(len(alist)):
                 a.add(alist[i])
             itrial = 0
-            
+
             while True:
                 try:
                     a.pop()
@@ -1171,11 +1165,11 @@ class pf:
 
             if itrial == 1: return True
             else: return False
-                
+
         else:
             print "length of given tuple variable must be exceeding 1"
             raise IOError
-        
+
 
     def bg_or_pf(self, pfs, condition = 'digits'):
         """
@@ -1185,10 +1179,10 @@ class pf:
         pfs[i] : i-th block
 
         condition ='digits':
-           when 'digitis' is the condition, those pseudo pole figure blocks 
+           when 'digitis' is the condition, those pseudo pole figure blocks
            having background with 0 subzero digts are determined to be background
               e.g.   if _2theta == 56.000000 -> BACKGROUND
-                     if _2THETA == 56.3432   -> POLEFIGURE  
+                     if _2THETA == 56.3432   -> POLEFIGURE
 
         condition ='chi0_measure':
            when 'chi0_measure' is the condition,those among pseduo pole figure blocks,
@@ -1199,7 +1193,7 @@ class pf:
             for i in range(len(pfs)):
                 info = self.block_info(block=pfs[i], echo=False)
                 set_2thet.add(info[0])
-                
+
                 th2 = float(set_2thet.pop())
                 if abs(th2 - int(th2)) > 0.0001: return 'pf'
                 else: return 'bg'
@@ -1220,9 +1214,9 @@ class pf:
         th2 = None    :2theta (at which the Bragg condition is satisfied)
         """
         rst = []
-        if th2!=None: 
+        if th2!=None:
             for i in range(len(self.data_block)):
-                cb = self.data_block[i] #cb : current block                
+                cb = self.data_block[i] #cb : current block
                 if abs( float(_info(cb,'_2THETA')) - th2) < 0.1:
                     if echo ==True:
                         self.block_info(cb)
@@ -1264,3 +1258,24 @@ class pf:
         return _2theta, _khi, _steptime, _stepsize, str(delta_alpha)
     pass # end of class pf
 
+if __name__=='__main__':
+    import matplotlib.pyplot as plt
+    import getopt, sys
+
+    ## arguments -- ##
+    try: opts, args = getopt.getopt(
+        sys.argv[1:], 'f:i')
+
+    except getopt.GetoptError, err:
+        print str(err)
+        sys.exit(2)
+
+    info = False
+    for o, a in opts:
+        if o in ('-f'):
+            filename = a
+        if o in ('-i'): # show the basic information of the files
+            info = True
+
+
+    pf(filename=filename,info=info)

@@ -1,0 +1,6 @@
+* FCC
+Fhkl = 4f, h,k,l all even or all odd
+        0, h,k,l mixed parity
+* BCC
+Fhkl = 2f, h+k+l even
+        0, h+k+l odd
