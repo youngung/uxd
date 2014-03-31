@@ -1,0 +1,22 @@
+** XRD DEFOCUSS CORRECTION FILE **
+** mode: avg
+ Defocuss correction curve from isotropic random ferritic stainless steel#2
+_2THETA=  99.452
+  Khi  Intensity    DF_factor
+     0   567        1.000
+     5   548        1.036
+    10   552        1.028
+    15   571        0.993
+    20   547        1.036
+    25   542        1.046
+    30   547        1.037
+    35   549        1.034
+    40   539        1.051
+    45   528        1.074
+    50   524        1.082
+    55   501        1.132
+    60   484        1.171
+    65   449        1.261
+    70   398        1.425
+    75   324        1.749
+    80   225        2.520
