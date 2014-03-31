@@ -40,6 +40,8 @@ Exemplery use,
 #### prints out the documentation to the module.####
 # print __manual__
 ####################################################
+def h():
+    print __manual__
 
 import numpy as np
 sort = np.sort
